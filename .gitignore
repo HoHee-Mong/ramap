@@ -22,8 +22,9 @@ backend/out/
 .DS_Store
 Thumbs.db
 
-# 로그
+# 로그 및 임시 파일
 *.log
+*.err
 
 # Claude Code 설정
 .claude/
