@@ -1,0 +1,29 @@
+# 환경변수
+.env
+**/.env
+
+# 프론트엔드
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# 백엔드
+backend/.gradle/
+backend/build/
+backend/out/
+*.class
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로그
+*.log
+
+# Claude Code 설정
+.claude/
