@@ -62,7 +62,8 @@ class FavoriteService(
             businessHours = shop.businessHours,
             menu = shop.menu,
             averageRating = shop.averageRating,
-            reviewCount = shop.reviewCount
+            reviewCount = shop.reviewCount,
+            status = shop.status
         )
     }
 }

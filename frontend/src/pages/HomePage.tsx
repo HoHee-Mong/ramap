@@ -3,21 +3,45 @@ import { Link } from 'react-router-dom'
 import MapView from '../components/map/MapView'
 import useShops from '../hooks/useShops'
 import useCategories from '../hooks/useCategories'
-import { SearchIcon, SlidersIcon, XIcon } from '../components/common/Icons'
+import { fetchNearbyShops } from '../api/shopApi'
+import { SearchIcon, SlidersIcon, XIcon, NavigationIcon } from '../components/common/Icons'
+import type { Shop } from '../types/shop'
 
-// 홈 페이지 - 카카오맵 + 카테고리 필터
+// 홈 페이지 - 카카오맵 + 카테고리 필터 + 내 위치 기반 주변 가게
 function HomePage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+  const [nearbyShops, setNearbyShops] = useState<Shop[] | null>(null)
+  const [isLocating, setIsLocating] = useState(false)
   const { shops, isLoading, error } = useShops(selectedCategoryId)
   const { categories } = useCategories()
 
   const selectedCategory = categories.find(c => c.id === selectedCategoryId)
+  const displayShops = nearbyShops ?? shops
+
+  // 내 위치 기반 주변 가게 조회
+  const handleLocate = () => {
+    if (!navigator.geolocation) return
+    setIsLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const result = await fetchNearbyShops(coords.latitude, coords.longitude)
+          setNearbyShops(result)
+        } catch {
+          // 위치 조회 실패 시 무시
+        } finally {
+          setIsLocating(false)
+        }
+      },
+      () => setIsLocating(false),
+    )
+  }
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       {/* 지도 */}
-      {!isLoading && <MapView shops={shops} />}
+      {!isLoading && <MapView shops={displayShops} />}
 
       {/* 플로팅 헤더 */}
       <header style={headerStyle}>
@@ -42,8 +66,26 @@ function HomePage() {
               </span>
             </button>
           )}
+          {nearbyShops && (
+            <button onClick={() => setNearbyShops(null)} style={selectedChipStyle}>
+              주변 가게 {nearbyShops.length}개
+              <span style={{ marginLeft: '4px', display: 'inline-flex', alignItems: 'center' }}>
+                <XIcon size={13} color="#FFFFFF" />
+              </span>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* 내 위치 버튼 */}
+      <button
+        onClick={handleLocate}
+        disabled={isLocating}
+        style={locateButtonStyle}
+        title="내 주변 가게 찾기"
+      >
+        <NavigationIcon size={20} color={nearbyShops ? '#2BA8A0' : '#374151'} />
+      </button>
 
       {/* 에러 메시지 */}
       {error && <div style={errorStyle}>{error}</div>}
@@ -128,6 +170,23 @@ const searchButtonStyle: React.CSSProperties = {
   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
   pointerEvents: 'auto',
   textDecoration: 'none',
+}
+
+const locateButtonStyle: React.CSSProperties = {
+  position: 'absolute',
+  bottom: '80px',
+  right: '16px',
+  zIndex: 10,
+  width: '44px',
+  height: '44px',
+  backgroundColor: 'rgba(255,255,255,0.95)',
+  border: 'none',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
 }
 
 const filterBarStyle: React.CSSProperties = {

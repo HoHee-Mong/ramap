@@ -30,5 +30,6 @@ data class Shop(
     val menu: List<MenuItem> = emptyList(),
     val averageRating: Double = 0.0,
     val reviewCount: Int = 0,
+    val status: String = "pending", // pending | approved | rejected
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

@@ -39,6 +39,7 @@ class SecurityConfig(
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
                 // 관리자만 허용
+                auth.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.PUT, "/api/v1/categories/**").hasRole("ADMIN")
                 auth.requestMatchers(HttpMethod.DELETE, "/api/v1/categories/**").hasRole("ADMIN")

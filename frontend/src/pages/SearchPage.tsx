@@ -1,27 +1,24 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useShops from '../hooks/useShops'
 import useCategories from '../hooks/useCategories'
 import { SearchIcon, HeartIcon, StarIcon, XIcon } from '../components/common/Icons'
 import type { Shop } from '../types/shop'
 
-// 검색 페이지 - 가게 목록 + 텍스트 검색 + 카테고리 필터
+// 검색 페이지 - 가게 목록 + 텍스트 검색(서버사이드) + 카테고리 필터
 function SearchPage() {
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
-  const { shops, isLoading } = useShops(selectedCategoryId)
+  const { shops, isLoading } = useShops(selectedCategoryId, debouncedQuery)
   const { categories } = useCategories()
   const navigate = useNavigate()
 
-  // 클라이언트 사이드 텍스트 검색 필터링
-  const filteredShops = useMemo(() => {
-    if (!query.trim()) return shops
-    const lower = query.toLowerCase()
-    return shops.filter(s =>
-      s.name.toLowerCase().includes(lower) ||
-      s.address.toLowerCase().includes(lower)
-    )
-  }, [shops, query])
+  // 검색어 디바운싱 (500ms 후 서버 요청)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 500)
+    return () => clearTimeout(timer)
+  }, [query])
 
   return (
     <div style={pageStyle}>
@@ -66,20 +63,20 @@ function SearchPage() {
 
       {/* 결과 수 */}
       <p style={resultCountStyle}>
-        검색 결과 <span style={{ color: '#2BA8A0', fontWeight: 700 }}>{filteredShops.length}</span>
+        검색 결과 <span style={{ color: '#2BA8A0', fontWeight: 700 }}>{shops.length}</span>
       </p>
 
       {/* 가게 목록 */}
       <div style={listStyle}>
         {isLoading ? (
           <p style={emptyStyle}>불러오는 중...</p>
-        ) : filteredShops.length === 0 ? (
+        ) : shops.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 0' }}>
             <span style={{ fontSize: '40px' }}>🍜</span>
             <p style={{ ...emptyStyle, marginTop: '12px' }}>검색 결과가 없습니다.</p>
           </div>
         ) : (
-          filteredShops.map(shop => (
+          shops.map(shop => (
             <ShopCard key={shop.id} shop={shop} onClick={() => navigate(`/shops/${shop.id}`)} />
           ))
         )}

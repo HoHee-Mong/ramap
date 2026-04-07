@@ -33,12 +33,14 @@ data class LoginRequest(
 data class AuthResponse(
     val token: String,
     val email: String,
-    val nickname: String
+    val nickname: String,
+    val role: String
 )
 
 // /me 엔드포인트 응답 DTO
 data class UserInfoResponse(
     val id: String,
     val email: String,
-    val nickname: String
+    val nickname: String,
+    val role: String
 )

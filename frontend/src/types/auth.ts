@@ -4,6 +4,7 @@ export interface User {
   id: string
   email: string
   nickname: string
+  role: 'USER' | 'ADMIN'
 }
 
 export interface SignupRequest {
@@ -21,4 +22,5 @@ export interface AuthResponse {
   token: string
   email: string
   nickname: string
+  role: 'USER' | 'ADMIN'
 }

@@ -10,6 +10,36 @@ import {
   MapPinIcon, ClockIcon, PhoneIcon,
 } from '../components/common/Icons'
 
+// 카카오 공유 메시지 전송 (Kakao SDK 초기화 포함)
+function shareViaKakao(shopName: string, address: string, shopId: string) {
+  const kakao = window.Kakao
+  if (!kakao) return
+  if (!kakao.isInitialized()) {
+    kakao.init(import.meta.env.VITE_KAKAO_MAP_KEY)
+  }
+  kakao.Share.sendDefault({
+    objectType: 'feed',
+    content: {
+      title: shopName,
+      description: address,
+      imageUrl: 'https://ramapp.vercel.app/ramen-og.png',
+      link: {
+        mobileWebUrl: `${window.location.origin}/shops/${shopId}`,
+        webUrl: `${window.location.origin}/shops/${shopId}`,
+      },
+    },
+    buttons: [
+      {
+        title: '가게 보기',
+        link: {
+          mobileWebUrl: `${window.location.origin}/shops/${shopId}`,
+          webUrl: `${window.location.origin}/shops/${shopId}`,
+        },
+      },
+    ],
+  })
+}
+
 // 가게 상세 페이지
 function ShopDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -71,6 +101,15 @@ function ShopDetailPage() {
             <HeartIcon size={20} color={isFavorite ? '#EF4444' : '#6B7280'} filled={isFavorite} />
           </button>
         )}
+
+        {/* 카카오톡 공유 버튼 */}
+        <button
+          onClick={() => shareViaKakao(shop.name, shop.address, id!)}
+          style={shareButtonStyle}
+          title="카카오톡으로 공유"
+        >
+          <span style={{ fontSize: '16px' }}>💬</span>
+        </button>
       </div>
 
       {/* 스크롤 콘텐츠 */}
@@ -209,6 +248,22 @@ const backButtonOnlyStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
+}
+
+const shareButtonStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '48px',
+  right: '60px',
+  width: '36px',
+  height: '36px',
+  backgroundColor: 'rgba(255,255,255,0.9)',
+  border: 'none',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
 }
 
 function favoriteOverlayStyle(isFavorite: boolean): React.CSSProperties {

@@ -82,6 +82,7 @@ function RegisterShopPage() {
         phone,
         businessHours,
       }, token!)
+      alert('제보가 접수됐습니다! 관리자 검토 후 지도에 표시됩니다.')
       navigate('/')
     } catch {
       setError('가게 등록에 실패했습니다. 다시 시도해주세요.')

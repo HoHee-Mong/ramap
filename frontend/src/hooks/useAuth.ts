@@ -15,18 +15,18 @@ export function useAuth() {
     setToken(newToken)
   }, [])
 
-  // 로그인 처리: 토큰 저장 + 유저 상태 설정
+  // 로그인 처리: 토큰 저장 + 유저 상태 설정 (role 포함)
   const login = useCallback(async (request: LoginRequest) => {
     const response = await authApi.login(request)
     saveToken(response.token)
-    setUser({ id: '', email: response.email, nickname: response.nickname })
+    setUser({ id: '', email: response.email, nickname: response.nickname, role: response.role })
   }, [saveToken])
 
-  // 회원가입 처리: 토큰 저장 + 유저 상태 설정
+  // 회원가입 처리: 토큰 저장 + 유저 상태 설정 (role 포함)
   const signup = useCallback(async (request: SignupRequest) => {
     const response = await authApi.signup(request)
     saveToken(response.token)
-    setUser({ id: '', email: response.email, nickname: response.nickname })
+    setUser({ id: '', email: response.email, nickname: response.nickname, role: response.role })
   }, [saveToken])
 
   // 로그아웃: 토큰/유저 상태 초기화
