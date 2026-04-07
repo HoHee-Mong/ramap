@@ -5,7 +5,10 @@ import { useFavorite } from '../hooks/useFavorite'
 import { useAuthContext } from '../context/AuthContext'
 import ReviewList from '../components/review/ReviewList'
 import ReviewForm from '../components/review/ReviewForm'
-import StarRating from '../components/review/StarRating'
+import {
+  ChevronLeftIcon, HeartIcon, StarIcon,
+  MapPinIcon, ClockIcon, PhoneIcon,
+} from '../components/common/Icons'
 
 // 가게 상세 페이지
 function ShopDetailPage() {
@@ -22,7 +25,7 @@ function ShopDetailPage() {
   if (isLoading) {
     return (
       <div style={pageStyle}>
-        <p style={{ color: '#AAAAAA', textAlign: 'center', paddingTop: '60px' }}>불러오는 중...</p>
+        <p style={{ color: '#AAAAAA', textAlign: 'center', paddingTop: '80px' }}>불러오는 중...</p>
       </div>
     )
   }
@@ -30,175 +33,242 @@ function ShopDetailPage() {
   if (error || !shop) {
     return (
       <div style={pageStyle}>
-        <p style={{ color: '#E8001C', marginBottom: '16px' }}>{error ?? '가게를 찾을 수 없습니다.'}</p>
-        <button onClick={() => navigate('/')} style={backButtonStyle}>← 지도로 돌아가기</button>
+        <button onClick={() => navigate(-1)} style={backButtonOnlyStyle}>
+          <ChevronLeftIcon size={24} color="#1A1A1A" />
+        </button>
+        <p style={{ color: '#DC2626', textAlign: 'center', marginTop: '80px' }}>
+          {error ?? '가게를 찾을 수 없습니다.'}
+        </p>
       </div>
     )
   }
 
   return (
     <div style={pageStyle}>
-      <button onClick={() => navigate('/')} style={backButtonStyle}>← 지도로 돌아가기</button>
+      {/* 상단 이미지 / 플레이스홀더 */}
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        {shop.imageUrl ? (
+          <img src={shop.imageUrl} alt={shop.name} style={heroImageStyle} />
+        ) : (
+          <div style={heroPlaceholderStyle}>
+            <span style={{ fontSize: '64px' }}>🍜</span>
+          </div>
+        )}
 
-      {/* 가게 헤더 카드 */}
-      <div style={headerCardStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3 }}>{shop.name}</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {shop.reviewCount > 0 && (
-              <div style={ratingBadgeStyle}>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#E8001C' }}>★ {shop.averageRating.toFixed(1)}</span>
-                <span style={{ fontSize: '11px', color: '#AAAAAA', marginLeft: '4px' }}>({shop.reviewCount})</span>
-              </div>
+        {/* 뒤로가기 버튼 */}
+        <button onClick={() => navigate(-1)} style={backButtonOverlayStyle}>
+          <ChevronLeftIcon size={22} color="#1A1A1A" />
+        </button>
+
+        {/* 즐겨찾기 버튼 (로그인 시에만 표시) */}
+        {isAuthenticated && (
+          <button
+            onClick={toggleFavorite}
+            disabled={isFavoriteLoading}
+            style={favoriteOverlayStyle(isFavorite)}
+            title={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+          >
+            <HeartIcon size={20} color={isFavorite ? '#EF4444' : '#6B7280'} filled={isFavorite} />
+          </button>
+        )}
+      </div>
+
+      {/* 스크롤 콘텐츠 */}
+      <div style={contentStyle}>
+        {/* 가게명 + 카테고리 + 별점 */}
+        <div style={sectionStyle}>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
+            {shop.categories.map(cat => (
+              <span key={cat.id} style={tagStyle}>{cat.name}</span>
+            ))}
+          </div>
+          <h1 style={shopNameStyle}>{shop.name}</h1>
+          {shop.reviewCount > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
+              <StarIcon size={16} />
+              <span style={{ fontSize: '15px', fontWeight: 700, color: '#1A1A1A' }}>
+                {shop.averageRating.toFixed(1)}
+              </span>
+              <span style={{ fontSize: '14px', color: '#AAAAAA' }}>({shop.reviewCount})</span>
+            </div>
+          )}
+        </div>
+
+        {/* 가게 정보 카드 */}
+        <div style={cardStyle}>
+          <h2 style={sectionTitleStyle}>가게 정보</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <InfoRow icon={<MapPinIcon size={18} color="#AAAAAA" />} text={shop.address} />
+            {shop.businessHours && (
+              <InfoRow icon={<ClockIcon size={18} color="#AAAAAA" />} text={shop.businessHours} />
             )}
-            {/* 로그인 시에만 즐겨찾기 버튼 표시 */}
-            {isAuthenticated && (
-              <button
-                onClick={toggleFavorite}
-                disabled={isFavoriteLoading}
-                style={favoriteButtonStyle}
-                title={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
-              >
-                {isFavorite ? '♥' : '♡'}
-              </button>
+            {shop.phone && (
+              <InfoRow icon={<PhoneIcon size={18} color="#AAAAAA" />} text={shop.phone} />
             )}
           </div>
         </div>
 
-        {/* 카테고리 태그 */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
-          {shop.categories.map((category) => (
-            <span key={category.id} style={tagStyle}>{category.name}</span>
-          ))}
-        </div>
-      </div>
+        {/* 메뉴 카드 */}
+        {shop.menu.length > 0 && (
+          <div style={cardStyle}>
+            <h2 style={sectionTitleStyle}>대표 메뉴</h2>
+            {shop.menu.map((item, index) => (
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '10px 0',
+                  borderBottom: index < shop.menu.length - 1 ? '1px solid #F0F0F0' : 'none',
+                }}
+              >
+                <span style={{ fontSize: '14px', color: '#1A1A1A' }}>{item.name}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#1A1A1A' }}>
+                  {item.price.toLocaleString()}원
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
-      {/* 기본 정보 카드 */}
-      <div style={cardStyle}>
-        <SectionTitle>정보</SectionTitle>
-        <InfoRow label="주소" value={shop.address} />
-        {shop.phone && <InfoRow label="전화번호" value={shop.phone} />}
-        {shop.businessHours && <InfoRow label="영업시간" value={shop.businessHours} />}
-      </div>
-
-      {/* 메뉴 카드 */}
-      {shop.menu.length > 0 && (
-        <div style={cardStyle}>
-          <SectionTitle>메뉴</SectionTitle>
-          {shop.menu.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '10px 0',
-                borderBottom: index < shop.menu.length - 1 ? '1px solid #F0F0F0' : 'none',
-              }}
-            >
-              <span style={{ fontSize: '14px', color: '#1A1A1A' }}>{item.name}</span>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: '#1A1A1A' }}>{item.price.toLocaleString()}원</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 리뷰 섹션 */}
-      <div style={{ ...cardStyle, paddingBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-          <SectionTitle>리뷰</SectionTitle>
-          {shop.reviewCount > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <StarRating value={Math.round(shop.averageRating)} />
-              <span style={{ fontSize: '13px', color: '#666666' }}>{shop.reviewCount}개</span>
-            </div>
-          )}
-        </div>
-        <ReviewForm shopId={id!} onSubmitted={refetch} />
-        <div style={{ marginTop: '20px' }}>
-          <ReviewList shopId={id!} reviews={reviews} onDeleted={refetch} />
+        {/* 리뷰 섹션 */}
+        <div style={{ ...cardStyle, marginBottom: '32px' }}>
+          <h2 style={sectionTitleStyle}>리뷰 {shop.reviewCount > 0 && `(${shop.reviewCount})`}</h2>
+          <ReviewForm shopId={id!} onSubmitted={refetch} />
+          <div style={{ marginTop: '16px' }}>
+            <ReviewList shopId={id!} reviews={reviews} onDeleted={refetch} />
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+// 정보 행 컴포넌트
+function InfoRow({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#1A1A1A', marginBottom: '14px' }}>{children}</h2>
-  )
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', gap: '12px', marginBottom: '10px', fontSize: '14px' }}>
-      <span style={{ color: '#AAAAAA', minWidth: '64px', flexShrink: 0 }}>{label}</span>
-      <span style={{ color: '#1A1A1A' }}>{value}</span>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px', color: '#444444' }}>
+      <div style={{ marginTop: '1px', flexShrink: 0 }}>{icon}</div>
+      <span style={{ lineHeight: '1.5' }}>{text}</span>
     </div>
   )
 }
 
 const pageStyle: React.CSSProperties = {
-  maxWidth: '520px',
-  margin: '0 auto',
-  padding: '80px 16px 40px',
+  position: 'absolute',
+  inset: 0,
+  overflowY: 'auto',
+  backgroundColor: '#F2EFE9',
+  display: 'flex',
+  flexDirection: 'column',
+}
+
+const heroImageStyle: React.CSSProperties = {
+  width: '100%',
+  height: '220px',
+  objectFit: 'cover',
+  display: 'block',
+}
+
+const heroPlaceholderStyle: React.CSSProperties = {
+  width: '100%',
+  height: '220px',
+  backgroundColor: '#E8F7F6',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}
+
+const backButtonOverlayStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '48px',
+  left: '16px',
+  width: '36px',
+  height: '36px',
+  backgroundColor: 'rgba(255,255,255,0.9)',
+  border: 'none',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+}
+
+const backButtonOnlyStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '48px',
+  left: '16px',
+  width: '36px',
+  height: '36px',
+  backgroundColor: '#F0F0F0',
+  border: 'none',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+}
+
+function favoriteOverlayStyle(isFavorite: boolean): React.CSSProperties {
+  return {
+    position: 'absolute',
+    top: '48px',
+    right: '16px',
+    width: '36px',
+    height: '36px',
+    backgroundColor: isFavorite ? '#FEF2F2' : 'rgba(255,255,255,0.9)',
+    border: 'none',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+  }
+}
+
+const contentStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '20px 16px',
   display: 'flex',
   flexDirection: 'column',
   gap: '12px',
 }
 
-const backButtonStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  fontSize: '14px',
-  color: '#666666',
-  cursor: 'pointer',
-  padding: 0,
-  textAlign: 'left',
+const sectionStyle: React.CSSProperties = {
+  paddingBottom: '4px',
 }
 
-const headerCardStyle: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
-  borderRadius: 'var(--radius-lg)',
-  padding: '20px',
-  boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-}
-
-const cardStyle: React.CSSProperties = {
-  backgroundColor: '#FFFFFF',
-  borderRadius: 'var(--radius-lg)',
-  padding: '20px',
-  boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-}
-
-const ratingBadgeStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: '#FFF5F5',
-  border: '1px solid #FFE0E0',
-  borderRadius: 'var(--radius-pill)',
-  padding: '4px 10px',
-  flexShrink: 0,
-}
-
-const favoriteButtonStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  fontSize: '22px',
-  cursor: 'pointer',
-  padding: '2px 4px',
-  color: '#E8001C',
-  lineHeight: 1,
+const shopNameStyle: React.CSSProperties = {
+  fontSize: '24px',
+  fontWeight: 800,
+  color: '#1A1A1A',
+  lineHeight: 1.3,
 }
 
 const tagStyle: React.CSSProperties = {
   padding: '4px 12px',
-  backgroundColor: '#E8001C',
-  borderRadius: 'var(--radius-pill)',
+  backgroundColor: '#E8F7F6',
+  borderRadius: '100px',
   fontSize: '12px',
-  fontWeight: 600,
-  color: '#FFFFFF',
-  letterSpacing: '0.3px',
+  fontWeight: 700,
+  color: '#2BA8A0',
+}
+
+const cardStyle: React.CSSProperties = {
+  backgroundColor: '#FFFFFF',
+  borderRadius: '16px',
+  padding: '20px',
+  boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+}
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: '15px',
+  fontWeight: 700,
+  color: '#1A1A1A',
+  marginBottom: '14px',
 }
 
 export default ShopDetailPage

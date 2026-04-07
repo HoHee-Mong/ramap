@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthContext } from '../context/AuthContext'
+import { ChevronLeftIcon } from '../components/common/Icons'
 
 // 회원가입 페이지
 function SignupPage() {
@@ -29,136 +30,152 @@ function SignupPage() {
 
   return (
     <div style={pageStyle}>
-      <div style={cardStyle}>
+      {/* 헤더 */}
+      <div style={headerStyle}>
+        <button onClick={() => navigate('/login')} style={backButtonStyle}>
+          <ChevronLeftIcon size={24} color="#1A1A1A" />
+        </button>
         <h1 style={titleStyle}>회원가입</h1>
-        <form onSubmit={handleSubmit} style={formStyle}>
-          <div style={fieldStyle}>
-            <label style={labelStyle}>이메일</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="이메일 입력"
-              required
-              style={inputStyle}
-            />
-          </div>
-          <div style={fieldStyle}>
-            <label style={labelStyle}>비밀번호 (8자 이상)</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="비밀번호 입력"
-              required
-              minLength={8}
-              style={inputStyle}
-            />
-          </div>
-          <div style={fieldStyle}>
-            <label style={labelStyle}>닉네임 (2~20자)</label>
-            <input
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="닉네임 입력"
-              required
-              minLength={2}
-              maxLength={20}
-              style={inputStyle}
-            />
-          </div>
-          {errorMessage && <p style={errorStyle}>{errorMessage}</p>}
-          <button type="submit" disabled={isSubmitting} style={buttonStyle}>
-            {isSubmitting ? '가입 중...' : '회원가입'}
-          </button>
-        </form>
-        <p style={linkStyle}>
-          이미 계정이 있으신가요?{' '}
-          <Link to="/login" style={{ color: '#E8001C' }}>로그인</Link>
-        </p>
+        <div style={{ width: '32px' }} />
       </div>
+
+      <form onSubmit={handleSubmit} style={formStyle}>
+        <Field label="이메일">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="이메일 입력"
+            required
+            style={inputStyle}
+          />
+        </Field>
+
+        <Field label="비밀번호 (8자 이상)">
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="비밀번호 입력"
+            required
+            minLength={8}
+            style={inputStyle}
+          />
+        </Field>
+
+        <Field label="닉네임 (2~20자)">
+          <input
+            type="text"
+            value={nickname}
+            onChange={e => setNickname(e.target.value)}
+            placeholder="닉네임 입력"
+            required
+            minLength={2}
+            maxLength={20}
+            style={inputStyle}
+          />
+        </Field>
+
+        {errorMessage && <p style={errorStyle}>{errorMessage}</p>}
+
+        <button type="submit" disabled={isSubmitting} style={submitButtonStyle}>
+          {isSubmitting ? '가입 중...' : '가입 완료하기'}
+        </button>
+      </form>
+
+      <p style={linkStyle}>
+        이미 계정이 있으신가요?{' '}
+        <Link to="/login" style={{ color: '#2BA8A0', fontWeight: 700, textDecoration: 'underline' }}>
+          로그인
+        </Link>
+      </p>
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+      <label style={{ fontSize: '13px', fontWeight: 600, color: '#666666' }}>{label}</label>
+      {children}
     </div>
   )
 }
 
 const pageStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  backgroundColor: '#FFFFFF',
   display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  minHeight: '100vh',
-  backgroundColor: '#111',
-  paddingTop: '72px',
+  flexDirection: 'column',
 }
 
-const cardStyle: React.CSSProperties = {
-  backgroundColor: '#1A1A1A',
-  borderRadius: '12px',
-  padding: '40px',
-  width: '100%',
-  maxWidth: '400px',
-  boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '48px 16px 20px',
+  borderBottom: '1px solid #F0F0F0',
+}
+
+const backButtonStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  padding: '4px',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
 }
 
 const titleStyle: React.CSSProperties = {
-  color: '#F5F5F5',
-  fontSize: '24px',
-  fontWeight: 700,
-  marginBottom: '32px',
-  textAlign: 'center',
+  fontSize: '18px',
+  fontWeight: 800,
+  color: '#1A1A1A',
 }
 
 const formStyle: React.CSSProperties = {
+  flex: 1,
   display: 'flex',
   flexDirection: 'column',
   gap: '16px',
-}
-
-const fieldStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '6px',
-}
-
-const labelStyle: React.CSSProperties = {
-  color: '#AAAAAA',
-  fontSize: '13px',
-  fontWeight: 500,
+  padding: '24px 32px',
 }
 
 const inputStyle: React.CSSProperties = {
-  backgroundColor: '#2A2A2A',
-  border: '1px solid #333',
-  borderRadius: '8px',
-  padding: '10px 14px',
-  color: '#F5F5F5',
+  width: '100%',
+  padding: '13px 14px',
+  border: '1.5px solid #E0E0E0',
+  borderRadius: '14px',
   fontSize: '14px',
-  outline: 'none',
+  color: '#1A1A1A',
+  backgroundColor: '#F9F9F9',
 }
 
 const errorStyle: React.CSSProperties = {
-  color: '#E8001C',
+  color: '#DC2626',
   fontSize: '13px',
   margin: 0,
 }
 
-const buttonStyle: React.CSSProperties = {
-  backgroundColor: '#E8001C',
+const submitButtonStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '14px',
+  backgroundColor: '#2BA8A0',
   color: '#FFFFFF',
   border: 'none',
-  borderRadius: '8px',
-  padding: '12px',
+  borderRadius: '14px',
   fontSize: '15px',
-  fontWeight: 600,
+  fontWeight: 700,
   cursor: 'pointer',
   marginTop: '8px',
+  boxShadow: '0 4px 12px rgba(43,168,160,0.3)',
 }
 
 const linkStyle: React.CSSProperties = {
-  color: '#777',
-  fontSize: '13px',
+  color: '#AAAAAA',
+  fontSize: '14px',
   textAlign: 'center',
-  marginTop: '20px',
+  padding: '20px 32px 40px',
 }
 
 export default SignupPage

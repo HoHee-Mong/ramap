@@ -35,4 +35,5 @@ export interface Shop {
   menu: MenuItem[]
   reviewCount: number
   averageRating: number
+  imageUrl?: string
 }

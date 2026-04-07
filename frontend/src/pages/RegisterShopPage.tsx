@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { createShop } from '../api/shopApi'
 import useCategories from '../hooks/useCategories'
 import { useAuthContext } from '../context/AuthContext'
+import { ChevronLeftIcon } from '../components/common/Icons'
 
-// 가게 등록 페이지
+// 가게 등록 페이지 (로그인 필요)
 function RegisterShopPage() {
   const navigate = useNavigate()
   const { token } = useAuthContext()
@@ -50,9 +51,9 @@ function RegisterShopPage() {
 
   // 카테고리 선택 토글 (중복 선택 가능)
   const toggleCategory = (categoryId: string) => {
-    setSelectedCategoryIds((previous) =>
+    setSelectedCategoryIds(previous =>
       previous.includes(categoryId)
-        ? previous.filter((id) => id !== categoryId)
+        ? previous.filter(id => id !== categoryId)
         : [...previous, categoryId]
     )
   }
@@ -91,11 +92,23 @@ function RegisterShopPage() {
 
   return (
     <div style={pageStyle}>
-      <h1 style={pageTitleStyle}>가게 등록</h1>
+      {/* 헤더 */}
+      <div style={headerStyle}>
+        <button onClick={() => navigate(-1)} style={backButtonStyle}>
+          <ChevronLeftIcon size={24} color="#1A1A1A" />
+        </button>
+        <h1 style={pageTitleStyle}>새로운 라멘집 제보 🍜</h1>
+      </div>
 
       <form onSubmit={handleSubmit} style={formStyle}>
         <Field label="가게 이름 *">
-          <input value={name} onChange={(e) => setName(e.target.value)} required style={inputStyle} placeholder="가게 이름을 입력하세요" />
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+            style={inputStyle}
+            placeholder="예: 오레노라멘 본점"
+          />
         </Field>
 
         <Field label="주소 *">
@@ -104,32 +117,22 @@ function RegisterShopPage() {
               value={address}
               readOnly
               placeholder="주소 검색을 눌러주세요"
-              style={{ ...inputStyle, flex: 1, backgroundColor: '#F5F5F5', cursor: 'default' }}
+              style={{ ...inputStyle, flex: 1, backgroundColor: '#F0F0F0', cursor: 'default' }}
             />
             <button type="button" onClick={openAddressSearch} style={searchButtonStyle}>
-              주소 검색
+              검색
             </button>
           </div>
         </Field>
 
         <Field label="카테고리 *">
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '4px' }}>
-            {categories.map((category) => (
+            {categories.map(category => (
               <button
                 key={category.id}
                 type="button"
                 onClick={() => toggleCategory(category.id)}
-                style={{
-                  padding: '7px 16px',
-                  borderRadius: 'var(--radius-pill)',
-                  border: selectedCategoryIds.includes(category.id) ? 'none' : '1.5px solid #E0E0E0',
-                  backgroundColor: selectedCategoryIds.includes(category.id) ? '#E8001C' : '#FFFFFF',
-                  color: selectedCategoryIds.includes(category.id) ? '#FFFFFF' : '#666666',
-                  fontSize: '13px',
-                  fontWeight: selectedCategoryIds.includes(category.id) ? 700 : 400,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
+                style={catButtonStyle(selectedCategoryIds.includes(category.id))}
               >
                 {category.name}
               </button>
@@ -138,21 +141,31 @@ function RegisterShopPage() {
         </Field>
 
         <Field label="전화번호">
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} placeholder="02-000-0000" />
+          <input
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+            style={inputStyle}
+            placeholder="02-000-0000"
+          />
         </Field>
 
         <Field label="영업시간">
-          <input value={businessHours} onChange={(e) => setBusinessHours(e.target.value)} style={inputStyle} placeholder="예: 11:00 - 21:00" />
+          <input
+            value={businessHours}
+            onChange={e => setBusinessHours(e.target.value)}
+            style={inputStyle}
+            placeholder="예: 11:00 - 21:00"
+          />
         </Field>
 
-        {error && <p style={{ color: '#E8001C', fontSize: '13px' }}>{error}</p>}
+        {error && <p style={errorStyle}>{error}</p>}
 
         <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-          <button type="button" onClick={() => navigate('/')} style={cancelButtonStyle}>
+          <button type="button" onClick={() => navigate(-1)} style={cancelButtonStyle}>
             취소
           </button>
           <button type="submit" disabled={isSubmitting} style={submitButtonStyle}>
-            {isSubmitting ? '등록 중...' : '등록하기'}
+            {isSubmitting ? '등록 중...' : '관리자에게 제보하기'}
           </button>
         </div>
       </form>
@@ -163,77 +176,116 @@ function RegisterShopPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      <label style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A1A', letterSpacing: '0.2px' }}>{label}</label>
+      <label style={{ fontSize: '13px', fontWeight: 700, color: '#1A1A1A' }}>{label}</label>
       <div>{children}</div>
     </div>
   )
 }
 
 const pageStyle: React.CSSProperties = {
-  maxWidth: '480px',
-  margin: '0 auto',
-  padding: '80px 16px 40px',
+  position: 'absolute',
+  inset: 0,
+  overflowY: 'auto',
+  backgroundColor: '#F2EFE9',
+}
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  padding: '48px 16px 16px',
+  backgroundColor: '#FFFFFF',
+  borderBottom: '1px solid #F0F0F0',
+}
+
+const backButtonStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  padding: '4px',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  flexShrink: 0,
 }
 
 const pageTitleStyle: React.CSSProperties = {
-  fontSize: '22px',
-  fontWeight: 700,
+  fontSize: '18px',
+  fontWeight: 800,
   color: '#1A1A1A',
-  marginBottom: '28px',
 }
 
 const formStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: '20px',
-  backgroundColor: '#FFFFFF',
-  borderRadius: 'var(--radius-lg)',
+  margin: '16px',
   padding: '24px',
-  boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
+  backgroundColor: '#FFFFFF',
+  borderRadius: '16px',
+  boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
 }
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '11px 14px',
+  padding: '12px 14px',
   border: '1.5px solid #E0E0E0',
-  borderRadius: 'var(--radius-md)',
+  borderRadius: '12px',
   fontSize: '14px',
   color: '#1A1A1A',
   backgroundColor: '#FFFFFF',
 }
 
 const searchButtonStyle: React.CSSProperties = {
-  padding: '11px 16px',
+  padding: '12px 16px',
   backgroundColor: '#1A1A1A',
   color: '#FFFFFF',
   border: 'none',
-  borderRadius: 'var(--radius-md)',
+  borderRadius: '12px',
   fontSize: '13px',
-  fontWeight: 600,
+  fontWeight: 700,
   cursor: 'pointer',
   whiteSpace: 'nowrap',
 }
 
+function catButtonStyle(isSelected: boolean): React.CSSProperties {
+  return {
+    padding: '8px 16px',
+    borderRadius: '100px',
+    border: isSelected ? 'none' : '1.5px solid #E0E0E0',
+    backgroundColor: isSelected ? '#2BA8A0' : '#FFFFFF',
+    color: isSelected ? '#FFFFFF' : '#666666',
+    fontSize: '13px',
+    fontWeight: isSelected ? 700 : 400,
+    cursor: 'pointer',
+    transition: 'all 0.15s',
+  }
+}
+
+const errorStyle: React.CSSProperties = {
+  color: '#DC2626',
+  fontSize: '13px',
+}
+
 const submitButtonStyle: React.CSSProperties = {
   flex: 1,
-  padding: '13px',
-  backgroundColor: '#E8001C',
+  padding: '14px',
+  backgroundColor: '#2BA8A0',
   color: '#FFFFFF',
   border: 'none',
-  borderRadius: 'var(--radius-md)',
+  borderRadius: '12px',
   fontSize: '15px',
   fontWeight: 700,
   cursor: 'pointer',
-  letterSpacing: '0.3px',
+  boxShadow: '0 4px 12px rgba(43,168,160,0.3)',
 }
 
 const cancelButtonStyle: React.CSSProperties = {
   flex: 1,
-  padding: '13px',
-  backgroundColor: '#F5F5F5',
+  padding: '14px',
+  backgroundColor: '#F0F0F0',
   color: '#666666',
   border: 'none',
-  borderRadius: 'var(--radius-md)',
+  borderRadius: '12px',
   fontSize: '15px',
   fontWeight: 600,
   cursor: 'pointer',

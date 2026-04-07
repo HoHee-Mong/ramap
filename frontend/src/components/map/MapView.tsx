@@ -11,12 +11,12 @@ interface Props {
 const SEOUL_CENTER = { lat: 37.5165, lng: 127.0050 }
 const DEFAULT_ZOOM_LEVEL = 8
 
-// 커스텀 레드 핀 마커 SVG (data URL)
+// 커스텀 틸 핀 마커 SVG (data URL)
 const MARKER_SVG = encodeURIComponent(
   '<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">' +
-  '<path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.268 21.732 0 14 0z" fill="#E8001C"/>' +
+  '<path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.268 21.732 0 14 0z" fill="#2BA8A0"/>' +
   '<circle cx="14" cy="14" r="6" fill="#FFFFFF"/>' +
-  '<circle cx="14" cy="14" r="3" fill="#E8001C"/>' +
+  '<circle cx="14" cy="14" r="3" fill="#2BA8A0"/>' +
   '</svg>'
 )
 const MARKER_IMAGE_SRC = `data:image/svg+xml;charset=utf-8,${MARKER_SVG}`
@@ -53,7 +53,7 @@ function MapView({ shops }: Props) {
     }
   }, [map, shops])
 
-  return <div ref={mapContainerRef} style={{ width: '100%', height: 'calc(100vh - var(--nav-height))' }} />
+  return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
 }
 
 export default MapView
