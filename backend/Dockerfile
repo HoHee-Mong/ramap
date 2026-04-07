@@ -9,15 +9,17 @@ COPY gradle gradle
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
 
-# gradle.properties의 org.gradle.jvmargs가 JAVA_TOOL_OPTIONS보다 우선 적용됨
 COPY gradle.properties .
 
-# 의존성 다운로드 (env -u로 JAVA_TOOL_OPTIONS를 프로세스 수준에서 제거)
-RUN chmod +x gradlew && env -u JAVA_TOOL_OPTIONS ./gradlew dependencies --no-daemon
+# gradlew 스크립트를 우회하여 java -jar로 직접 실행 (Railway JVM 환경변수 충돌 방지)
+RUN chmod +x gradlew && \
+    env -u JAVA_TOOL_OPTIONS -u _JAVA_OPTIONS -u JDK_JAVA_OPTIONS -u JAVA_OPTS \
+    java -Xmx512m -Xms256m -jar gradle/wrapper/gradle-wrapper.jar dependencies --no-daemon
 
 # 소스 복사 후 빌드
 COPY src src
-RUN env -u JAVA_TOOL_OPTIONS ./gradlew bootJar --no-daemon
+RUN env -u JAVA_TOOL_OPTIONS -u _JAVA_OPTIONS -u JDK_JAVA_OPTIONS -u JAVA_OPTS \
+    java -Xmx512m -Xms256m -jar gradle/wrapper/gradle-wrapper.jar bootJar --no-daemon
 
 # 실행 스테이지
 FROM eclipse-temurin:21-jre
