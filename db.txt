@@ -1,0 +1,4 @@
+didtmdgh0917_db_user
+GZUnTLmyHE9AAiy4
+
+mongodb+srv://didtmdgh0917_db_user:GZUnTLmyHE9AAiy4@ramap.cqurnt9.mongodb.net/?appName=ramap
