@@ -41,16 +41,13 @@ html, body {
 
 body {
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #1A1A1A;
+  background-color: var(--cloud);
   color: var(--black);
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
 }
 
 input, textarea, button {
@@ -71,35 +68,13 @@ input:focus, textarea:focus {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 폰 프레임 */
+/* 앱 레이아웃 컨테이너 */
 .phone-frame {
   width: 100%;
-  max-width: 420px;
   height: 100dvh;
   position: relative;
   overflow: hidden;
   background-color: var(--cloud);
   display: flex;
   flex-direction: column;
-}
-
-@media (min-width: 768px) {
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100dvh;
-    padding: 24px;
-  }
-
-  #root {
-    align-items: center;
-  }
-
-  .phone-frame {
-    height: min(840px, calc(100dvh - 48px));
-    border-radius: 40px;
-    border: 8px solid #333;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-  }
 }
