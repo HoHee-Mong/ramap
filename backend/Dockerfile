@@ -12,12 +12,12 @@ COPY settings.gradle.kts .
 # gradle.properties의 org.gradle.jvmargs가 JAVA_TOOL_OPTIONS보다 우선 적용됨
 COPY gradle.properties .
 
-# 의존성 다운로드
-RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
+# 의존성 다운로드 (env -u로 JAVA_TOOL_OPTIONS를 프로세스 수준에서 제거)
+RUN chmod +x gradlew && env -u JAVA_TOOL_OPTIONS ./gradlew dependencies --no-daemon
 
 # 소스 복사 후 빌드
 COPY src src
-RUN ./gradlew bootJar --no-daemon
+RUN env -u JAVA_TOOL_OPTIONS ./gradlew bootJar --no-daemon
 
 # 실행 스테이지
 FROM eclipse-temurin:21-jre
