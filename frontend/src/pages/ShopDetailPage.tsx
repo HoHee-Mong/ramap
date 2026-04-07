@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import useShop from '../hooks/useShop'
 import useReviews from '../hooks/useReviews'
+import { useFavorite } from '../hooks/useFavorite'
+import { useAuthContext } from '../context/AuthContext'
 import ReviewList from '../components/review/ReviewList'
 import ReviewForm from '../components/review/ReviewForm'
 import StarRating from '../components/review/StarRating'
@@ -9,8 +11,13 @@ import StarRating from '../components/review/StarRating'
 function ShopDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { isAuthenticated, token } = useAuthContext()
   const { shop, isLoading, error } = useShop(id!)
   const { reviews, refetch } = useReviews(id!)
+  const { isFavorite, isLoading: isFavoriteLoading, toggleFavorite } = useFavorite({
+    shopId: id!,
+    token: isAuthenticated ? token : null,
+  })
 
   if (isLoading) {
     return (
@@ -37,18 +44,31 @@ function ShopDetailPage() {
       <div style={headerCardStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3 }}>{shop.name}</h1>
-          {shop.reviewCount > 0 && (
-            <div style={ratingBadgeStyle}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#E8001C' }}>★ {shop.averageRating.toFixed(1)}</span>
-              <span style={{ fontSize: '11px', color: '#AAAAAA', marginLeft: '4px' }}>({shop.reviewCount})</span>
-            </div>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {shop.reviewCount > 0 && (
+              <div style={ratingBadgeStyle}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#E8001C' }}>★ {shop.averageRating.toFixed(1)}</span>
+                <span style={{ fontSize: '11px', color: '#AAAAAA', marginLeft: '4px' }}>({shop.reviewCount})</span>
+              </div>
+            )}
+            {/* 로그인 시에만 즐겨찾기 버튼 표시 */}
+            {isAuthenticated && (
+              <button
+                onClick={toggleFavorite}
+                disabled={isFavoriteLoading}
+                style={favoriteButtonStyle}
+                title={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+              >
+                {isFavorite ? '♥' : '♡'}
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* 라멘 종류 태그 */}
+        {/* 카테고리 태그 */}
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
-          {shop.ramenTypes.map((type) => (
-            <span key={type} style={tagStyle}>{type}</span>
+          {shop.categories.map((category) => (
+            <span key={category.id} style={tagStyle}>{category.name}</span>
           ))}
         </div>
       </div>
@@ -159,6 +179,16 @@ const ratingBadgeStyle: React.CSSProperties = {
   borderRadius: 'var(--radius-pill)',
   padding: '4px 10px',
   flexShrink: 0,
+}
+
+const favoriteButtonStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  fontSize: '22px',
+  cursor: 'pointer',
+  padding: '2px 4px',
+  color: '#E8001C',
+  lineHeight: 1,
 }
 
 const tagStyle: React.CSSProperties = {

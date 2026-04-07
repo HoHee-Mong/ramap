@@ -9,6 +9,7 @@ import RegisterShopPage from './pages/RegisterShopPage'
 import ShopDetailPage from './pages/ShopDetailPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import MyPage from './pages/MyPage'
 
 function App() {
   return (
@@ -29,6 +30,14 @@ function App() {
               }
             />
             <Route path="/shops/:id" element={<ShopDetailPage />} />
+            <Route
+              path="/my"
+              element={
+                <ProtectedRoute>
+                  <MyPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </AuthProvider>

@@ -24,7 +24,7 @@ data class Shop(
     val name: String,
     val address: String,
     val location: GeoLocation,
-    val ramenTypes: List<String>,
+    val categoryIds: List<String> = emptyList(),
     val phone: String = "",
     val businessHours: String = "",
     val menu: List<MenuItem> = emptyList(),

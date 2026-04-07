@@ -47,7 +47,7 @@ function Navbar() {
       <div style={navActionsStyle}>
         {isAuthenticated ? (
           <>
-            <span style={nicknameStyle}>{user?.nickname}</span>
+            <Link to="/my" style={nicknameStyle}>{user?.nickname}</Link>
             <Link to="/register" style={registerButtonStyle}>+ 가게 등록</Link>
             <button onClick={handleLogout} style={logoutButtonStyle}>로그아웃</button>
           </>
@@ -86,6 +86,7 @@ const navActionsStyle: React.CSSProperties = {
 const nicknameStyle: React.CSSProperties = {
   color: '#AAAAAA',
   fontSize: '13px',
+  textDecoration: 'none',
 }
 
 const registerButtonStyle: React.CSSProperties = {

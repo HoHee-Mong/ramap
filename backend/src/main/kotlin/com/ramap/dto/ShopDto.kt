@@ -9,7 +9,7 @@ data class ShopRequest(
     val name: String,
     val address: String,
     val location: GeoLocation,
-    val ramenTypes: List<String>,
+    val categoryIds: List<String>,
     val phone: String = "",
     val businessHours: String = "",
     val menu: List<MenuItem> = emptyList()
@@ -19,12 +19,15 @@ data class ShopRequest(
         name = name,
         address = address,
         location = location,
-        ramenTypes = ramenTypes,
+        categoryIds = categoryIds,
         phone = phone,
         businessHours = businessHours,
         menu = menu
     )
 }
+
+// 가게 응답에 포함되는 카테고리 정보
+data class CategoryInfo(val id: String, val name: String)
 
 // 가게 응답 DTO
 data class ShopResponse(
@@ -32,26 +35,10 @@ data class ShopResponse(
     val name: String,
     val address: String,
     val location: GeoLocation,
-    val ramenTypes: List<String>,
+    val categories: List<CategoryInfo>,
     val phone: String,
     val businessHours: String,
     val menu: List<MenuItem>,
     val averageRating: Double,
     val reviewCount: Int
-) {
-    companion object {
-        // Shop 도큐먼트를 응답 DTO로 변환
-        fun from(shop: Shop) = ShopResponse(
-            id = shop.id!!,
-            name = shop.name,
-            address = shop.address,
-            location = shop.location,
-            ramenTypes = shop.ramenTypes,
-            phone = shop.phone,
-            businessHours = shop.businessHours,
-            menu = shop.menu,
-            averageRating = shop.averageRating,
-            reviewCount = shop.reviewCount
-        )
-    }
-}
+)

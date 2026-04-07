@@ -24,7 +24,7 @@ class AuthConfig(private val userRepository: UserRepository) {
                 ?: throw UsernameNotFoundException("유저를 찾을 수 없습니다: $email")
             User.withUsername(user.email)
                 .password(user.password)
-                .roles("USER")
+                .roles(user.role)
                 .build()
         }
     }

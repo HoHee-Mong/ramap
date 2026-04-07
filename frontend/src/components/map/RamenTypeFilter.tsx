@@ -1,25 +1,27 @@
-import { RAMEN_TYPES } from '../../constants/ramenTypes'
+import useCategories from '../../hooks/useCategories'
 
 interface Props {
-  selectedType: string | null
-  onSelect: (type: string | null) => void
+  selectedCategoryId: string | null
+  onSelect: (categoryId: string | null) => void
 }
 
-// 라멘 종류별 필터 버튼 UI
-function RamenTypeFilter({ selectedType, onSelect }: Props) {
+// 카테고리별 필터 버튼 UI (API에서 동적으로 카테고리 로드)
+function RamenTypeFilter({ selectedCategoryId, onSelect }: Props) {
+  const { categories } = useCategories()
+
   return (
     <div style={{ display: 'flex', gap: '6px' }}>
       <FilterButton
         label="전체"
-        isActive={selectedType === null}
+        isActive={selectedCategoryId === null}
         onClick={() => onSelect(null)}
       />
-      {RAMEN_TYPES.map((type) => (
+      {categories.map((category) => (
         <FilterButton
-          key={type}
-          label={type}
-          isActive={selectedType === type}
-          onClick={() => onSelect(selectedType === type ? null : type)}
+          key={category.id}
+          label={category.name}
+          isActive={selectedCategoryId === category.id}
+          onClick={() => onSelect(selectedCategoryId === category.id ? null : category.id)}
         />
       ))}
     </div>

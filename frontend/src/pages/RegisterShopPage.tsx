@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createShop } from '../api/shopApi'
-import { RAMEN_TYPES } from '../constants/ramenTypes'
+import useCategories from '../hooks/useCategories'
 import { useAuthContext } from '../context/AuthContext'
 
 // 가게 등록 페이지
 function RegisterShopPage() {
   const navigate = useNavigate()
   const { token } = useAuthContext()
+  const { categories } = useCategories()
 
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [lat, setLat] = useState<number | null>(null)
   const [lng, setLng] = useState<number | null>(null)
-  const [selectedRamenTypes, setSelectedRamenTypes] = useState<string[]>([])
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([])
   const [phone, setPhone] = useState('')
   const [businessHours, setBusinessHours] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -36,7 +37,6 @@ function RegisterShopPage() {
       oncomplete: (data: any) => {
         const selectedAddress = data.roadAddress || data.jibunAddress
         setAddress(selectedAddress)
-        // Daum Postcode는 좌표를 빈 문자열로 반환할 수 있어 Geocoder로 별도 변환
         const geocoder = new window.kakao.maps.services.Geocoder()
         geocoder.addressSearch(selectedAddress, (result: any[], status: string) => {
           if (status === window.kakao.maps.services.Status.OK) {
@@ -48,12 +48,12 @@ function RegisterShopPage() {
     }).open()
   }
 
-  // 라멘 종류 체크박스 토글
-  const toggleRamenType = (type: string) => {
-    setSelectedRamenTypes((previous) =>
-      previous.includes(type)
-        ? previous.filter((t) => t !== type)
-        : [...previous, type]
+  // 카테고리 선택 토글 (중복 선택 가능)
+  const toggleCategory = (categoryId: string) => {
+    setSelectedCategoryIds((previous) =>
+      previous.includes(categoryId)
+        ? previous.filter((id) => id !== categoryId)
+        : [...previous, categoryId]
     )
   }
 
@@ -66,8 +66,8 @@ function RegisterShopPage() {
       setError('주소 검색으로 위치를 설정해주세요.')
       return
     }
-    if (selectedRamenTypes.length === 0) {
-      setError('라멘 종류를 하나 이상 선택해주세요.')
+    if (selectedCategoryIds.length === 0) {
+      setError('카테고리를 하나 이상 선택해주세요.')
       return
     }
 
@@ -77,7 +77,7 @@ function RegisterShopPage() {
         name,
         address,
         location: { lat, lng },
-        ramenTypes: selectedRamenTypes,
+        categoryIds: selectedCategoryIds,
         phone,
         businessHours,
       }, token!)
@@ -112,26 +112,26 @@ function RegisterShopPage() {
           </div>
         </Field>
 
-        <Field label="라멘 종류 *">
+        <Field label="카테고리 *">
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '4px' }}>
-            {RAMEN_TYPES.map((type) => (
+            {categories.map((category) => (
               <button
-                key={type}
+                key={category.id}
                 type="button"
-                onClick={() => toggleRamenType(type)}
+                onClick={() => toggleCategory(category.id)}
                 style={{
                   padding: '7px 16px',
                   borderRadius: 'var(--radius-pill)',
-                  border: selectedRamenTypes.includes(type) ? 'none' : '1.5px solid #E0E0E0',
-                  backgroundColor: selectedRamenTypes.includes(type) ? '#E8001C' : '#FFFFFF',
-                  color: selectedRamenTypes.includes(type) ? '#FFFFFF' : '#666666',
+                  border: selectedCategoryIds.includes(category.id) ? 'none' : '1.5px solid #E0E0E0',
+                  backgroundColor: selectedCategoryIds.includes(category.id) ? '#E8001C' : '#FFFFFF',
+                  color: selectedCategoryIds.includes(category.id) ? '#FFFFFF' : '#666666',
                   fontSize: '13px',
-                  fontWeight: selectedRamenTypes.includes(type) ? 700 : 400,
+                  fontWeight: selectedCategoryIds.includes(category.id) ? 700 : 400,
                   cursor: 'pointer',
                   transition: 'all 0.15s',
                 }}
               >
-                {type}
+                {category.name}
               </button>
             ))}
           </div>

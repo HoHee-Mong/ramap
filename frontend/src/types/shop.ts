@@ -3,7 +3,7 @@ export interface ShopRequest {
   name: string
   address: string
   location: { lat: number; lng: number }
-  ramenTypes: string[]
+  categoryIds: string[]
   phone: string
   businessHours: string
 }
@@ -12,6 +12,12 @@ export interface ShopRequest {
 export interface MenuItem {
   name: string
   price: number
+}
+
+// 가게에 포함된 카테고리 정보
+export interface CategoryInfo {
+  id: string
+  name: string
 }
 
 // 가게 타입 정의
@@ -23,7 +29,7 @@ export interface Shop {
     lat: number
     lng: number
   }
-  ramenTypes: string[]
+  categories: CategoryInfo[]
   phone?: string
   businessHours?: string
   menu: MenuItem[]

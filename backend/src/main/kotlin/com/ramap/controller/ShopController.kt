@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/ramen-shops")
 class ShopController(private val shopService: ShopService) {
 
-    // 전체 또는 라멘 종류별 가게 목록 조회
+    // 전체 또는 카테고리별 가게 목록 조회
     @GetMapping
-    fun getAllShops(@RequestParam(required = false) ramenType: String?): ApiResponse<*> {
-        return ApiResponse.ok(shopService.getShops(ramenType))
+    fun getAllShops(@RequestParam(required = false) categoryId: String?): ApiResponse<*> {
+        return ApiResponse.ok(shopService.getShops(categoryId))
     }
 
     // 단건 가게 조회

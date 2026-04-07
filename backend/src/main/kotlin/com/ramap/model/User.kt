@@ -12,5 +12,7 @@ data class User(
     @Indexed(unique = true) val email: String,
     val password: String, // BCrypt 해싱된 비밀번호
     val nickname: String,
+    val favoriteShopIds: List<String> = emptyList(), // 즐겨찾기한 가게 ID 목록
+    val role: String = "USER", // 권한: USER 또는 ADMIN
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

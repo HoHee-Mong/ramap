@@ -5,14 +5,14 @@ import useShops from '../hooks/useShops'
 
 // 홈 페이지 - 지도 메인 화면
 function HomePage() {
-  const [selectedRamenType, setSelectedRamenType] = useState<string | null>(null)
-  const { shops, isLoading, error } = useShops(selectedRamenType)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const { shops, isLoading, error } = useShops(selectedCategoryId)
 
   return (
     <main style={{ paddingTop: 'var(--nav-height)', position: 'relative' }}>
-      {/* 라멘 종류 필터 */}
+      {/* 카테고리 필터 */}
       <div style={filterBarStyle}>
-        <RamenTypeFilter selectedType={selectedRamenType} onSelect={setSelectedRamenType} />
+        <RamenTypeFilter selectedCategoryId={selectedCategoryId} onSelect={setSelectedCategoryId} />
       </div>
 
       {error && (

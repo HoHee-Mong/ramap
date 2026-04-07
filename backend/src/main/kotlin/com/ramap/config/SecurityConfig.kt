@@ -37,10 +37,16 @@ class SecurityConfig(
                 auth.requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/ramen-shops/**").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                // 관리자만 허용
+                auth.requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasRole("ADMIN")
+                auth.requestMatchers(HttpMethod.PUT, "/api/v1/categories/**").hasRole("ADMIN")
+                auth.requestMatchers(HttpMethod.DELETE, "/api/v1/categories/**").hasRole("ADMIN")
                 // 로그인 필요
                 auth.requestMatchers("/api/v1/auth/me").authenticated()
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/ramen-shops").authenticated()
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/reviews/**").authenticated()
+                auth.requestMatchers("/api/v1/favorites/**").authenticated()
                 auth.anyRequest().permitAll()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
