@@ -9,15 +9,15 @@ COPY gradle gradle
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
 
-# 외부 환경에서 주입될 수 있는 JVM 메모리 제한 설정을 덮어씀
-ENV GRADLE_OPTS="-Xmx512m -Xms256m"
+# gradle.properties의 org.gradle.jvmargs가 JAVA_TOOL_OPTIONS보다 우선 적용됨
+COPY gradle.properties .
 
 # 의존성 다운로드
-RUN unset JAVA_TOOL_OPTIONS && chmod +x gradlew && ./gradlew dependencies --no-daemon
+RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
 
 # 소스 복사 후 빌드
 COPY src src
-RUN unset JAVA_TOOL_OPTIONS && ./gradlew bootJar --no-daemon
+RUN ./gradlew bootJar --no-daemon
 
 # 실행 스테이지
 FROM eclipse-temurin:21-jre
