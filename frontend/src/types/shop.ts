@@ -27,4 +27,6 @@ export interface Shop {
   phone?: string
   businessHours?: string
   menu: MenuItem[]
+  reviewCount: number
+  averageRating: number
 }
