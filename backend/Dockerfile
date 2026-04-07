@@ -9,6 +9,10 @@ COPY gradle gradle
 COPY build.gradle.kts .
 COPY settings.gradle.kts .
 
+# 외부 환경에서 주입될 수 있는 JVM 메모리 제한 설정을 덮어씀
+ENV GRADLE_OPTS="-Xmx512m -Xms256m"
+ENV JAVA_TOOL_OPTIONS=""
+
 # 의존성 다운로드
 RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
 
