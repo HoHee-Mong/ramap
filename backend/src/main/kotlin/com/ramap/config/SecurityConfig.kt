@@ -34,6 +34,7 @@ class SecurityConfig(
             .exceptionHandling { it.authenticationEntryPoint(authEntryPoint) }
             .authorizeHttpRequests { auth ->
                 // 인증 없이 허용
+                auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 auth.requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/ramen-shops/**").permitAll()
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
