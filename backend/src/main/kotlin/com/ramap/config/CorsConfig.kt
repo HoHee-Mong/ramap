@@ -15,7 +15,8 @@ class CorsConfig : WebMvcConfigurer {
                 "https://ramap-4up2yb0jl-hohee-mongs-projects.vercel.app",
                 "https://ramapp.vercel.app"
             )
-            .allowedMethods("GET", "POST", "PUT", "DELETE")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowCredentials(true)
             .allowedHeaders("*")
     }
 }
