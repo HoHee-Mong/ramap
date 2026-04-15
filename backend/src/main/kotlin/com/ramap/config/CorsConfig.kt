@@ -13,7 +13,8 @@ class CorsConfig : WebMvcConfigurer {
             .allowedOrigins(
                 "http://localhost:5173",
                 "https://ramap-4up2yb0jl-hohee-mongs-projects.vercel.app",
-                "https://ramapp.vercel.app"
+                "https://ramapp.vercel.app",
+                "https://ramap-production.up.railway.app"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowCredentials(true)
